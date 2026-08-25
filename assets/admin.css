@@ -6,6 +6,31 @@
   margin: 20px 0;
 }
 
+.fm-global {
+  max-width: 860px;
+  margin: 16px 0 8px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 8px;
+}
+
+.fm-global__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.fm-global .fm-field {
+  max-width: none;
+}
+
+@media (max-width: 782px) {
+  .fm-global__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .fm-row {
   background: #fff;
   border: 1px solid #c3c4c7;

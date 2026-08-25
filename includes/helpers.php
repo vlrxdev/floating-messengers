@@ -108,12 +108,49 @@ function fm_get_settings() {
         $option['buttons'] = fm_default_buttons();
     }
 
+    $size = isset($option['icon_size']) ? (int) $option['icon_size'] : 56;
+    $option['icon_size'] = max(32, min(96, $size));
+
+    $positions = array_keys(fm_positions());
+    $position  = sanitize_key($option['position'] ?? 'bottom-right');
+    $option['position'] = in_array($position, $positions, true) ? $position : 'bottom-right';
+
+    $option['offset_x'] = max(0, min(200, isset($option['offset_x']) ? (int) $option['offset_x'] : 20));
+    $option['offset_y'] = max(0, min(200, isset($option['offset_y']) ? (int) $option['offset_y'] : 20));
+
     return $option;
+}
+
+function fm_positions() {
+    return [
+        'bottom-right' => 'Справа снизу',
+        'bottom-left'  => 'Слева снизу',
+        'top-right'    => 'Справа сверху',
+        'top-left'     => 'Слева сверху',
+    ];
 }
 
 function fm_get_buttons() {
     $settings = fm_get_settings();
     return is_array($settings['buttons'] ?? null) ? $settings['buttons'] : [];
+}
+
+function fm_get_icon_size() {
+    $settings = fm_get_settings();
+    return (int) ($settings['icon_size'] ?? 56);
+}
+
+function fm_get_position() {
+    $settings = fm_get_settings();
+    return $settings['position'] ?? 'bottom-right';
+}
+
+function fm_get_offsets() {
+    $settings = fm_get_settings();
+    return [
+        'x' => (int) ($settings['offset_x'] ?? 20),
+        'y' => (int) ($settings['offset_y'] ?? 20),
+    ];
 }
 
 function fm_build_button_url($button) {

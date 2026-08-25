@@ -50,8 +50,15 @@ add_action('admin_enqueue_scripts', function ($hook) {
 });
 
 function fm_sanitize_settings($input) {
-    $types   = array_keys(fm_button_types());
-    $buttons = [];
+    $types     = array_keys(fm_button_types());
+    $buttons   = [];
+    $size      = isset($input['icon_size']) ? (int) $input['icon_size'] : 56;
+    $size      = max(32, min(96, $size));
+    $position  = sanitize_key($input['position'] ?? 'bottom-right');
+    $positions = array_keys(fm_positions());
+    $position  = in_array($position, $positions, true) ? $position : 'bottom-right';
+    $offset_x  = max(0, min(200, isset($input['offset_x']) ? (int) $input['offset_x'] : 20));
+    $offset_y  = max(0, min(200, isset($input['offset_y']) ? (int) $input['offset_y'] : 20));
 
     if (!empty($input['buttons']) && is_array($input['buttons'])) {
         foreach ($input['buttons'] as $button) {
@@ -91,7 +98,13 @@ function fm_sanitize_settings($input) {
         }
     }
 
-    return ['buttons' => $buttons];
+    return [
+        'icon_size' => $size,
+        'position'  => $position,
+        'offset_x'  => $offset_x,
+        'offset_y'  => $offset_y,
+        'buttons'   => $buttons,
+    ];
 }
 
 function fm_render_button_row($index, $button = null) {
@@ -174,14 +187,68 @@ function fm_render_settings_page() {
         return;
     }
 
-    $buttons = fm_get_buttons();
+    $settings  = fm_get_settings();
+    $buttons   = $settings['buttons'];
+    $icon_size = (int) ($settings['icon_size'] ?? 56);
+    $position  = $settings['position'] ?? 'bottom-right';
+    $offset_x  = (int) ($settings['offset_x'] ?? 20);
+    $offset_y  = (int) ($settings['offset_y'] ?? 20);
     ?>
     <div class="wrap">
         <h1>Плавающие мессенджеры</h1>
-        <p>Кнопки показываются справа снизу.</p>
+        <p>Настройте кнопки, размер и расположение блока на сайте.</p>
 
         <form method="post" action="options.php">
             <?php settings_fields('floating_messengers_group'); ?>
+
+            <div class="fm-global">
+                <div class="fm-global__grid">
+                    <label class="fm-field">
+                        <span>Размер кнопок (px)</span>
+                        <input type="number"
+                               class="small-text"
+                               name="<?php echo esc_attr(FM_OPTION_KEY); ?>[icon_size]"
+                               value="<?php echo esc_attr((string) $icon_size); ?>"
+                               min="32"
+                               max="96"
+                               step="2">
+                        <span class="description">От 32 до 96</span>
+                    </label>
+
+                    <label class="fm-field">
+                        <span>Расположение</span>
+                        <select name="<?php echo esc_attr(FM_OPTION_KEY); ?>[position]">
+                            <?php foreach (fm_positions() as $key => $label) : ?>
+                                <option value="<?php echo esc_attr($key); ?>" <?php selected($position, $key); ?>>
+                                    <?php echo esc_html($label); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+
+                    <label class="fm-field">
+                        <span>Отступ по горизонтали (px)</span>
+                        <input type="number"
+                               class="small-text"
+                               name="<?php echo esc_attr(FM_OPTION_KEY); ?>[offset_x]"
+                               value="<?php echo esc_attr((string) $offset_x); ?>"
+                               min="0"
+                               max="200"
+                               step="1">
+                    </label>
+
+                    <label class="fm-field">
+                        <span>Отступ по вертикали (px)</span>
+                        <input type="number"
+                               class="small-text"
+                               name="<?php echo esc_attr(FM_OPTION_KEY); ?>[offset_y]"
+                               value="<?php echo esc_attr((string) $offset_y); ?>"
+                               min="0"
+                               max="200"
+                               step="1">
+                    </label>
+                </div>
+            </div>
 
             <div id="fm-buttons-list" class="fm-list">
                 <?php

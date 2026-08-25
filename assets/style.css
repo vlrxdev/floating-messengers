@@ -1,19 +1,50 @@
 .fm-buttons {
+  --fm-btn-size: 56px;
+  --fm-icon-size: 28px;
+  --fm-gap: 12px;
+  --fm-offset-x: 20px;
+  --fm-offset-y: 20px;
   position: fixed;
-  right: 20px;
-  bottom: 20px;
   z-index: 99999;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--fm-gap);
+}
+
+.fm-buttons--bottom-right {
+  right: var(--fm-offset-x);
+  bottom: var(--fm-offset-y);
+  left: auto;
+  top: auto;
+}
+
+.fm-buttons--bottom-left {
+  left: var(--fm-offset-x);
+  bottom: var(--fm-offset-y);
+  right: auto;
+  top: auto;
+}
+
+.fm-buttons--top-right {
+  right: var(--fm-offset-x);
+  top: var(--fm-offset-y);
+  left: auto;
+  bottom: auto;
+}
+
+.fm-buttons--top-left {
+  left: var(--fm-offset-x);
+  top: var(--fm-offset-y);
+  right: auto;
+  bottom: auto;
 }
 
 .fm-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
+  width: var(--fm-btn-size);
+  height: var(--fm-btn-size);
   border-radius: 50%;
   color: #fff;
   text-decoration: none;
@@ -30,25 +61,7 @@
 }
 
 .fm-btn svg {
-  width: 28px;
-  height: 28px;
+  width: var(--fm-icon-size);
+  height: var(--fm-icon-size);
   display: block;
-}
-
-@media (max-width: 480px) {
-  .fm-buttons {
-    right: 14px;
-    bottom: 14px;
-    gap: 10px;
-  }
-
-  .fm-btn {
-    width: 50px;
-    height: 50px;
-  }
-
-  .fm-btn svg {
-    width: 24px;
-    height: 24px;
-  }
 }

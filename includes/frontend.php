@@ -34,6 +34,31 @@ add_action('wp_enqueue_scripts', function () {
         [],
         FM_VERSION
     );
+
+    $size      = fm_get_icon_size();
+    $icon_size = (int) round($size * 0.5);
+    $gap       = max(8, (int) round($size * 0.2));
+    $offsets   = fm_get_offsets();
+
+    wp_add_inline_style(
+        'floating-messengers',
+        sprintf(
+            '.fm-buttons{--fm-btn-size:%1$dpx;--fm-icon-size:%2$dpx;--fm-gap:%3$dpx;--fm-offset-x:%4$dpx;--fm-offset-y:%5$dpx;}',
+            $size,
+            $icon_size,
+            $gap,
+            $offsets['x'],
+            $offsets['y']
+        )
+    );
+
+    wp_enqueue_script(
+        'floating-messengers',
+        FM_PLUGIN_URL . 'assets/frontend.js',
+        [],
+        FM_VERSION,
+        true
+    );
 });
 
 add_action('wp_footer', function () {
@@ -45,21 +70,20 @@ add_action('wp_footer', function () {
     if (empty($buttons)) {
         return;
     }
+
+    $position = fm_get_position();
     ?>
-    <div class="fm-buttons" aria-label="Связаться с нами">
+    <div class="fm-buttons fm-buttons--<?php echo esc_attr($position); ?>" aria-label="Связаться с нами">
         <?php foreach ($buttons as $button) :
             $label = $button['label'] !== '' ? $button['label'] : 'Связаться';
             $type  = $button['type'] ?? 'custom';
             $color = $button['color'] ?? '#555555';
-            $is_external = !in_array($type, ['phone', 'email'], true);
             ?>
             <a class="fm-btn fm-btn--<?php echo esc_attr($type); ?>"
                href="<?php echo esc_url($button['url']); ?>"
                style="background-color: <?php echo esc_attr($color); ?>;"
-               <?php if ($is_external) : ?>
-                   target="_blank"
-                   rel="noopener noreferrer"
-               <?php endif; ?>
+               target="_blank"
+               rel="noopener noreferrer"
                aria-label="<?php echo esc_attr($label); ?>"
                title="<?php echo esc_attr($label); ?>">
                 <?php echo fm_get_icon_svg($type); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
